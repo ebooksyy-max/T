@@ -1,0 +1,6 @@
+{
+  "name": "My Bill Book",
+  "description": "Offline-first billing, invoice, inventory, customer Khata, purchase, payment, and reporting application for small businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
