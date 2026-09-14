@@ -170,27 +170,26 @@ fun CreatePurchaseScreen(
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text("Supplier / Vendor Details", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = supplierName,
-                                onValueChange = { supplierName = it },
-                                label = { Text("Supplier Name") },
-                                singleLine = true,
-                                modifier = Modifier.weight(1.2f).testTag("supplier_name_input")
-                            )
-                            OutlinedTextField(
-                                value = purchaseNumber,
-                                onValueChange = { purchaseNumber = it },
-                                label = { Text("Bill / Inv #") },
-                                singleLine = true,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
+                        OutlinedTextField(
+                            value = supplierName,
+                            onValueChange = { supplierName = it },
+                            label = { Text("Supplier Name") },
+                            placeholder = { Text("e.g. Om Logistics, Metro Wholesalers") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth().testTag("supplier_name_input")
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        OutlinedTextField(
+                            value = purchaseNumber,
+                            onValueChange = { purchaseNumber = it },
+                            label = { Text("Bill / Invoice Number") },
+                            placeholder = { Text("e.g. PUR-001") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
@@ -277,6 +276,7 @@ fun CreatePurchaseScreen(
                                         items = m
                                     },
                                     label = { Text("Qty (${item.unit})") },
+                                    placeholder = { Text("1.0") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     singleLine = true,
                                     modifier = Modifier.weight(1f)
@@ -291,6 +291,7 @@ fun CreatePurchaseScreen(
                                         items = m
                                     },
                                     label = { Text("Cost Rate (₹)") },
+                                    placeholder = { Text("0.00") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     singleLine = true,
                                     modifier = Modifier.weight(1f)
@@ -313,28 +314,43 @@ fun CreatePurchaseScreen(
                         Text("Payment to Vendor", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             OutlinedTextField(
                                 value = paidAmountText,
                                 onValueChange = { paidAmountText = it },
                                 label = { Text("Amount Paid Now (₹)") },
+                                placeholder = { Text("0.00") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.fillMaxWidth()
                             )
-                            Column(
-                                modifier = Modifier.weight(1f).padding(top = 8.dp),
-                                horizontalAlignment = Alignment.End
+
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (calc.dueAmount > 0) WarningAmber.copy(alpha = 0.08f) else SuccessGreen.copy(alpha = 0.08f)
                             ) {
-                                Text("Payable Balance", style = MaterialTheme.typography.bodySmall, color = TextMuted)
-                                Text(
-                                    CurrencyUtils.format(calc.dueAmount),
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = if (calc.dueAmount > 0) WarningAmber else SuccessGreen
-                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (calc.dueAmount > 0) "Payable Balance" else "Payment Status",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                                        color = if (calc.dueAmount > 0) WarningAmber else SuccessGreen
+                                    )
+                                    Text(
+                                        text = if (calc.dueAmount > 0) CurrencyUtils.format(calc.dueAmount) else "Fully Paid ✓",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = if (calc.dueAmount > 0) WarningAmber else SuccessGreen
+                                    )
+                                }
                             }
                         }
                     }

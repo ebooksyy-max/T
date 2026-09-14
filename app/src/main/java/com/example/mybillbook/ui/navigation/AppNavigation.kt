@@ -6,11 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.mybillbook.ads.AppLovinBanner
 import com.example.mybillbook.data.AppContainer
 import com.example.mybillbook.ui.bills.*
 import com.example.mybillbook.ui.components.AppBottomNavigationBar
@@ -43,18 +45,23 @@ fun AppNavigation(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                AppBottomNavigationBar(
-                    currentRoute = currentRoute,
-                    onNavigate = { targetRoute ->
-                        navController.navigate(targetRoute) {
-                            popUpTo(Routes.HOME) {
-                                saveState = true
+                androidx.compose.foundation.layout.Column {
+                    AppLovinBanner(
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                    AppBottomNavigationBar(
+                        currentRoute = currentRoute,
+                        onNavigate = { targetRoute ->
+                            navController.navigate(targetRoute) {
+                                popUpTo(Routes.HOME) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -98,13 +105,22 @@ fun AppNavigation(
                     defaultValue = null
                 })
             ) {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val activity = context as? android.app.Activity
                 val createBillVm = remember { CreateBillViewModel(container) }
                 CreateBillScreen(
                     viewModel = createBillVm,
                     onBackClick = { navController.popBackStack() },
                     onInvoiceSaved = { savedId ->
-                        navController.popBackStack()
-                        navController.navigate(Routes.billDetails(savedId))
+                        if (activity != null) {
+                            com.example.mybillbook.ads.AppLovinManager.showInterstitial(activity) {
+                                navController.popBackStack()
+                                navController.navigate(Routes.billDetails(savedId))
+                            }
+                        } else {
+                            navController.popBackStack()
+                            navController.navigate(Routes.billDetails(savedId))
+                        }
                     }
                 )
             }
@@ -301,11 +317,19 @@ fun AppNavigation(
                     container = container,
                     onBackClick = { navController.popBackStack() },
                     onBusinessProfileClick = { navController.navigate(Routes.BUSINESS_PROFILE) },
-                    onInvoiceSettingsClick = { navController.navigate(Routes.INVOICE_SETTINGS) }
+                    onInvoiceSettingsClick = { navController.navigate(Routes.INVOICE_SETTINGS) },
+                    onAdSettingsClick = { navController.navigate(Routes.AD_SETTINGS) }
                 )
             }
 
-            // 18. Business Profile
+            // 18. Ad Monetization Settings
+            composable(Routes.AD_SETTINGS) {
+                AdSettingsScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            // 19. Business Profile
             composable(Routes.BUSINESS_PROFILE) {
                 BusinessProfileScreen(
                     container = container,
@@ -313,7 +337,7 @@ fun AppNavigation(
                 )
             }
 
-            // 19. Invoice Settings
+            // 20. Invoice Settings
             composable(Routes.INVOICE_SETTINGS) {
                 InvoiceSettingsScreen(
                     container = container,

@@ -337,6 +337,7 @@ fun StockAdjustmentDialog(
                     value = qtyText,
                     onValueChange = { qtyText = it },
                     label = { Text(if (adjType == "SET") "New Stock Count" else "Quantity to adjust") },
+                    placeholder = { Text("0") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag("adjust_qty_input")
@@ -347,7 +348,8 @@ fun StockAdjustmentDialog(
                 OutlinedTextField(
                     value = reasonText,
                     onValueChange = { reasonText = it },
-                    label = { Text("Reason (e.g., Stock purchase, Damaged, Count correction)") },
+                    label = { Text("Adjustment Reason") },
+                    placeholder = { Text("e.g. Stock purchase, damaged, count correction") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )

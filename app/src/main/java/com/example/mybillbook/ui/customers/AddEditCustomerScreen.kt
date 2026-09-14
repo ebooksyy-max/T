@@ -37,6 +37,7 @@ fun AddEditCustomerScreen(
     var notes by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
     var nameError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
 
     LaunchedEffect(customerId) {
         if (customerId != null && customerId > 0) {
@@ -80,6 +81,10 @@ fun AddEditCustomerScreen(
                         onClick = {
                             if (name.isBlank()) {
                                 nameError = true
+                                return@PrimaryButton
+                            }
+                            if (phone.isNotBlank() && phone.length != 10) {
+                                phoneError = true
                                 return@PrimaryButton
                             }
                             isSaving = true
@@ -129,6 +134,7 @@ fun AddEditCustomerScreen(
                     if (it.isNotBlank()) nameError = false
                 },
                 label = { Text("Customer Name *") },
+                placeholder = { Text("e.g. Rahul Sharma, Apex Traders") },
                 isError = nameError,
                 supportingText = { if (nameError) Text("Customer name is required") },
                 singleLine = true,
@@ -137,9 +143,24 @@ fun AddEditCustomerScreen(
 
             OutlinedTextField(
                 value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Phone Number") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                onValueChange = { input ->
+                    val digits = input.filter { it.isDigit() }.take(10)
+                    phone = digits
+                    if (phoneError && (digits.isEmpty() || digits.length == 10)) {
+                        phoneError = false
+                    }
+                },
+                label = { Text("Mobile Number") },
+                placeholder = { Text("10-digit mobile number") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = phoneError,
+                supportingText = {
+                    if (phoneError) {
+                        Text("Please enter a valid 10-digit mobile number", color = MaterialTheme.colorScheme.error)
+                    } else if (phone.isNotEmpty()) {
+                        Text("${phone.length}/10 digits")
+                    }
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("customer_phone_field")
             )
@@ -148,6 +169,7 @@ fun AddEditCustomerScreen(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email Address") },
+                placeholder = { Text("e.g. name@example.com") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -157,6 +179,7 @@ fun AddEditCustomerScreen(
                 value = gstin,
                 onValueChange = { gstin = it },
                 label = { Text("GSTIN (Optional)") },
+                placeholder = { Text("e.g. 29AAAAA0000A1Z5") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -165,55 +188,53 @@ fun AddEditCustomerScreen(
                 value = address,
                 onValueChange = { address = it },
                 label = { Text("Billing Address") },
+                placeholder = { Text("Street address, building, landmark") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    label = { Text("City") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = state,
-                    onValueChange = { state = it },
-                    label = { Text("State") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = city,
+                onValueChange = { city = it },
+                label = { Text("City") },
+                placeholder = { Text("e.g. Mumbai, Bengaluru, Delhi") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = pincode,
-                    onValueChange = { pincode = it },
-                    label = { Text("Pincode") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = openingBalance,
-                    onValueChange = { openingBalance = it },
-                    label = { Text("Opening Balance (₹)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = state,
+                onValueChange = { state = it },
+                label = { Text("State") },
+                placeholder = { Text("e.g. Maharashtra, Karnataka") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = pincode,
+                onValueChange = { pincode = it.filter { ch -> ch.isDigit() }.take(6) },
+                label = { Text("Pincode (6 digits)") },
+                placeholder = { Text("e.g. 560001") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = openingBalance,
+                onValueChange = { openingBalance = it },
+                label = { Text("Opening Balance (₹)") },
+                placeholder = { Text("0.00") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes / Remarks") },
+                placeholder = { Text("Add any customer notes or remarks") },
                 modifier = Modifier.fillMaxWidth()
             )
         }

@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.mybillbook.ui.theme.*
 import com.example.mybillbook.utils.CurrencyUtils
 
@@ -25,39 +24,43 @@ fun SummaryCard(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     icon: ImageVector? = null,
-    iconTint: Color = PrimaryBlue,
-    iconBg: Color = PrimaryBlueLight,
-    valueColor: Color = TextPrimary,
+    iconTint: Color = BillBookColors.Primary,
+    iconBg: Color = BillBookColors.PrimaryLight,
+    valueColor: Color = BillBookColors.TextPrimary,
     onClick: (() -> Unit)? = null
 ) {
     Card(
         modifier = modifier
             .testTag("summary_card_${title.replace(" ", "_").lowercase()}"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = BillBookColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         onClick = { onClick?.invoke() },
         enabled = onClick != null
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(14.dp)
                 .fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = BillBookColors.TextSecondary,
+                    maxLines = 2,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 6.dp)
                 )
                 if (icon != null) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
                             .background(iconBg),
                         contentAlignment = Alignment.Center
@@ -66,18 +69,19 @@ fun SummaryCard(
                             imageVector = icon,
                             contentDescription = null,
                             tint = iconTint,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = CurrencyUtils.format(amount),
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                color = valueColor
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                color = valueColor,
+                maxLines = 1
             )
 
             if (!subtitle.isNullOrBlank()) {
@@ -85,7 +89,8 @@ fun SummaryCard(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = BillBookColors.TextSecondary,
+                    maxLines = 1
                 )
             }
         }
@@ -98,14 +103,16 @@ fun StatusChip(
     modifier: Modifier = Modifier
 ) {
     val (bg, text) = when (status.uppercase()) {
-        "PAID" -> Pair(SuccessGreenLight, SuccessGreen)
-        "PARTIALLY_PAID" -> Pair(WarningAmberLight, WarningAmber)
-        "UNPAID" -> Pair(DangerRedLight, DangerRed)
-        "CANCELLED" -> Pair(OutlineLight, TextMuted)
-        "DRAFT" -> Pair(InfoSkyLight, InfoSky)
-        "LOW_STOCK" -> Pair(DangerRedLight, DangerRed)
-        "IN_STOCK" -> Pair(SuccessGreenLight, SuccessGreen)
-        else -> Pair(SurfaceVariantLight, TextSecondary)
+        "PAID" -> Pair(BillBookColors.ChipPaidContainer, BillBookColors.ChipPaidText)
+        "PARTIALLY_PAID" -> Pair(BillBookColors.ChipPartiallyPaidContainer, BillBookColors.ChipPartiallyPaidText)
+        "UNPAID" -> Pair(BillBookColors.ChipUnpaidContainer, BillBookColors.ChipUnpaidText)
+        "CANCELLED" -> Pair(BillBookColors.ChipCancelledContainer, BillBookColors.ChipCancelledText)
+        "DRAFT" -> Pair(BillBookColors.ChipDraftContainer, BillBookColors.ChipDraftText)
+        "DUE" -> Pair(BillBookColors.ChipDueContainer, BillBookColors.ChipDueText)
+        "LOW_STOCK" -> Pair(BillBookColors.StockLowContainer, BillBookColors.StockLowIcon)
+        "OUT_OF_STOCK" -> Pair(BillBookColors.StockOutContainer, BillBookColors.StockOutIcon)
+        "IN_STOCK" -> Pair(BillBookColors.ChipPaidContainer, BillBookColors.ChipPaidText)
+        else -> Pair(BillBookColors.SurfaceVariant, BillBookColors.TextSecondary)
     }
 
     Surface(
@@ -130,9 +137,9 @@ fun MoneyText(
     style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyLarge
 ) {
     val color = when (isIncomeOrReceivable) {
-        true -> SuccessGreen
-        false -> DangerRed
-        null -> MaterialTheme.colorScheme.onSurface
+        true -> BillBookColors.SalesGreen
+        false -> BillBookColors.Error
+        null -> BillBookColors.TextPrimary
     }
 
     Text(

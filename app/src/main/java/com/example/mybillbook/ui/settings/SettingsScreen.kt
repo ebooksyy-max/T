@@ -35,6 +35,7 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     onBusinessProfileClick: () -> Unit,
     onInvoiceSettingsClick: () -> Unit,
+    onAdSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -114,6 +115,15 @@ fun SettingsScreen(
                     title = "Invoice & Printing Setup",
                     subtitle = "Prefix, serial numbering, terms & conditions",
                     onClick = onInvoiceSettingsClick
+                )
+            }
+
+            item {
+                SettingsNavigationItem(
+                    icon = Icons.Default.MonetizationOn,
+                    title = "AppLovin Monetization & Ads",
+                    subtitle = "Banner & Interstitial test IDs, SDK keys, ad controls",
+                    onClick = onAdSettingsClick
                 )
             }
 

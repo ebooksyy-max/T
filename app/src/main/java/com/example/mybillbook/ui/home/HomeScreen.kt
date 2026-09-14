@@ -45,6 +45,7 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier.testTag("home_screen"),
+        contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
@@ -53,15 +54,15 @@ fun HomeScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .height(56.dp)
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(verticalArrangement = Arrangement.Center) {
                         Text(
                             text = uiState.business.businessName.ifBlank { "My Bill Book" },
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = PrimaryBlue
                         )
                         Text(
@@ -71,27 +72,15 @@ fun HomeScreen(
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (uiState.recentInvoices.isEmpty()) {
-                            TextButton(
-                                onClick = { viewModel.loadSampleData() },
-                                modifier = Modifier.testTag("load_sample_data_button")
-                            ) {
-                                Icon(Icons.Default.AutoFixHigh, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Load Demo", style = MaterialTheme.typography.labelSmall)
-                            }
-                        }
-                        IconButton(
-                            onClick = onSettingsClick,
-                            modifier = Modifier.testTag("home_settings_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                    IconButton(
+                        onClick = onSettingsClick,
+                        modifier = Modifier.testTag("home_settings_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

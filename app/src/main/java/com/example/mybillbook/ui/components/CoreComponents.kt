@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.mybillbook.ui.theme.BillBookColors
 import com.example.mybillbook.ui.theme.PrimaryBlue
 import com.example.mybillbook.ui.theme.TextMuted
 
@@ -60,6 +61,7 @@ fun AppTopBar(
             }
         },
         actions = actions,
+        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -127,14 +129,15 @@ fun PrimaryButton(
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryBlue,
-            contentColor = androidx.compose.ui.graphics.Color.White
+            containerColor = BillBookColors.ButtonPrimaryBg,
+            contentColor = BillBookColors.ButtonPrimaryText,
+            disabledContainerColor = BillBookColors.ButtonPrimaryDisabled
         )
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(20.dp),
-                color = androidx.compose.ui.graphics.Color.White,
+                color = BillBookColors.ButtonPrimaryText,
                 strokeWidth = 2.dp
             )
         } else {
@@ -155,6 +158,127 @@ fun PrimaryButton(
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier
+            .defaultMinSize(minHeight = 50.dp)
+            .testTag("secondary_button_${text.replace(" ", "_").lowercase()}"),
+        enabled = enabled,
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, BillBookColors.ButtonSecondaryBorder),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = BillBookColors.ButtonSecondaryBg,
+            contentColor = BillBookColors.ButtonSecondaryText
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+            )
+        }
+    }
+}
+
+@Composable
+fun SuccessButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .defaultMinSize(minHeight = 50.dp)
+            .testTag("success_button_${text.replace(" ", "_").lowercase()}"),
+        enabled = enabled,
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = BillBookColors.ButtonSuccessBg,
+            contentColor = BillBookColors.ButtonSuccessText
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+            )
+        }
+    }
+}
+
+@Composable
+fun DangerButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .defaultMinSize(minHeight = 50.dp)
+            .testTag("danger_button_${text.replace(" ", "_").lowercase()}"),
+        enabled = enabled,
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = BillBookColors.ButtonDangerBg,
+            contentColor = BillBookColors.ButtonDangerText
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+            )
         }
     }
 }

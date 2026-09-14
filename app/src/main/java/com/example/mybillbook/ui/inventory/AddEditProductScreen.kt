@@ -22,6 +22,7 @@ import com.example.mybillbook.ui.components.AppTopBar
 import com.example.mybillbook.ui.components.ConfirmDialog
 import com.example.mybillbook.ui.components.PrimaryButton
 import com.example.mybillbook.ui.theme.DangerRed
+import com.example.mybillbook.ui.theme.PrimaryBlue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -154,38 +155,37 @@ fun AddEditProductScreen(
                     if (it.isNotBlank()) nameError = false
                 },
                 label = { Text("Product / Item Name *") },
+                placeholder = { Text("e.g. Wireless Mouse, Cotton T-Shirt") },
                 isError = nameError,
                 supportingText = { if (nameError) Text("Item name is required") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("product_name_input")
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = sku,
-                    onValueChange = { sku = it },
-                    label = { Text("SKU / Item Code") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = barcode,
-                    onValueChange = { barcode = it },
-                    label = { Text("Barcode") },
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            barcode = (100000000000L..999999999999L).random().toString()
-                        }) {
-                            Icon(Icons.Default.QrCode, contentDescription = "Generate Barcode")
-                        }
-                    },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = sku,
+                onValueChange = { sku = it },
+                label = { Text("SKU / Item Code (Optional)") },
+                placeholder = { Text("e.g. ITEM-001") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = barcode,
+                onValueChange = { barcode = it },
+                label = { Text("Barcode (Optional)") },
+                placeholder = { Text("e.g. 8901234567890") },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        barcode = (100000000000L..999999999999L).random().toString()
+                    }) {
+                        Icon(Icons.Default.QrCode, contentDescription = "Generate Barcode", tint = PrimaryBlue)
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Unit Selector Chips
             Text("Unit", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
@@ -207,27 +207,25 @@ fun AddEditProductScreen(
             }
 
             // Pricing
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = sellingPrice,
-                    onValueChange = { sellingPrice = it },
-                    label = { Text("Selling Price (₹) *") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f).testTag("selling_price_input")
-                )
-                OutlinedTextField(
-                    value = purchasePrice,
-                    onValueChange = { purchasePrice = it },
-                    label = { Text("Purchase Price (₹)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = sellingPrice,
+                onValueChange = { sellingPrice = it },
+                label = { Text("Selling Price (₹) *") },
+                placeholder = { Text("0.00") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().testTag("selling_price_input")
+            )
+
+            OutlinedTextField(
+                value = purchasePrice,
+                onValueChange = { purchasePrice = it },
+                label = { Text("Purchase Price (₹)") },
+                placeholder = { Text("0.00") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // GST Rate Chips
             Text("GST Tax Rate (%)", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
@@ -247,33 +245,32 @@ fun AddEditProductScreen(
             }
 
             // Stock Details
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = stockQuantity,
-                    onValueChange = { stockQuantity = it },
-                    label = { Text("Initial Stock Qty") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f).testTag("initial_stock_input")
-                )
-                OutlinedTextField(
-                    value = minimumStock,
-                    onValueChange = { minimumStock = it },
-                    label = { Text("Low Stock Alert Qty") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = stockQuantity,
+                onValueChange = { stockQuantity = it },
+                label = { Text("Initial Stock Qty") },
+                placeholder = { Text("0") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().testTag("initial_stock_input")
+            )
+
+            OutlinedTextField(
+                value = minimumStock,
+                onValueChange = { minimumStock = it },
+                label = { Text("Low Stock Alert Qty") },
+                placeholder = { Text("5") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Description
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Item Description (Optional)") },
+                placeholder = { Text("Add item details, size, or warranty") },
                 modifier = Modifier.fillMaxWidth()
             )
         }

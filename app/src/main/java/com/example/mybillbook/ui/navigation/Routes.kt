@@ -63,5 +63,6 @@ object Routes {
     const val TAX_SETTINGS = "tax_settings"
     const val BACKUP_RESTORE = "backup_restore"
     const val APP_SETTINGS = "app_settings"
+    const val AD_SETTINGS = "ad_settings"
     const val ONBOARDING = "onboarding"
 }

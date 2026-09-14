@@ -16,7 +16,7 @@ data class CreateBillUiState(
     val invoiceNumber: String = "",
     val invoiceDate: Long = System.currentTimeMillis(),
     val selectedCustomer: CustomerEntity? = null,
-    val customerNameInput: String = "Walk-in Customer",
+    val customerNameInput: String = "",
     val customerPhoneInput: String = "",
     val allCustomers: List<CustomerEntity> = emptyList(),
     val allProducts: List<ProductEntity> = emptyList(),
@@ -74,7 +74,7 @@ class CreateBillViewModel(private val container: AppContainer) : ViewModel() {
         _uiState.update { current ->
             val updated = current.copy(
                 selectedCustomer = customer,
-                customerNameInput = customer?.name ?: "Walk-in Customer",
+                customerNameInput = customer?.name ?: "",
                 customerPhoneInput = customer?.phone ?: ""
             )
             recalculate(updated)
@@ -224,6 +224,11 @@ class CreateBillViewModel(private val container: AppContainer) : ViewModel() {
         val state = _uiState.value
         if (state.items.isEmpty()) {
             _uiState.update { it.copy(errorMessage = "Please add at least one item to the bill") }
+            return
+        }
+
+        if (state.customerPhoneInput.isNotBlank() && state.customerPhoneInput.length != 10) {
+            _uiState.update { it.copy(errorMessage = "Please enter a valid 10-digit mobile number") }
             return
         }
 

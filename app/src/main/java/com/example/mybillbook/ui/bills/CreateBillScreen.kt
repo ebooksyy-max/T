@@ -168,27 +168,37 @@ fun CreateBillScreen(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             OutlinedTextField(
                                 value = uiState.customerNameInput,
                                 onValueChange = { viewModel.setCustomerManual(it, uiState.customerPhoneInput) },
                                 label = { Text("Customer Name") },
+                                placeholder = { Text("e.g. Rahul Sharma") },
                                 singleLine = true,
                                 modifier = Modifier
-                                    .weight(1.2f)
+                                    .fillMaxWidth()
                                     .testTag("customer_name_input")
                             )
                             OutlinedTextField(
                                 value = uiState.customerPhoneInput,
-                                onValueChange = { viewModel.setCustomerManual(uiState.customerNameInput, it) },
-                                label = { Text("Phone") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                onValueChange = { input ->
+                                    val digits = input.filter { it.isDigit() }.take(10)
+                                    viewModel.setCustomerManual(uiState.customerNameInput, digits)
+                                },
+                                label = { Text("Mobile Number") },
+                                placeholder = { Text("10-digit mobile number") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
+                                supportingText = {
+                                    if (uiState.customerPhoneInput.isNotEmpty()) {
+                                        Text("${uiState.customerPhoneInput.length}/10 digits")
+                                    }
+                                },
                                 modifier = Modifier
-                                    .weight(1f)
+                                    .fillMaxWidth()
                                     .testTag("customer_phone_input")
                             )
                         }
@@ -405,9 +415,9 @@ fun CreateBillScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             OutlinedTextField(
                                 value = if (uiState.receivedAmount == 0.0) "" else uiState.receivedAmount.toString(),
@@ -416,30 +426,38 @@ fun CreateBillScreen(
                                     viewModel.setReceivedAmount(amt)
                                 },
                                 label = { Text("Received Amount (₹)") },
+                                placeholder = { Text("0.00") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 singleLine = true,
                                 modifier = Modifier
-                                    .weight(1f)
+                                    .fillMaxWidth()
                                     .testTag("received_amount_input")
                             )
 
-                            // Due Amount Display
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(top = 8.dp),
-                                horizontalAlignment = Alignment.End
+                            // Balance Due / Status Display
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (uiState.calculation.dueAmount > 0) DangerRed.copy(alpha = 0.08f) else SuccessGreen.copy(alpha = 0.08f)
                             ) {
-                                Text(
-                                    text = "Balance Due",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = CurrencyUtils.format(uiState.calculation.dueAmount),
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = if (uiState.calculation.dueAmount > 0) DangerRed else SuccessGreen
-                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (uiState.calculation.dueAmount > 0) "Balance Due / Credit" else "Payment Status",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                                        color = if (uiState.calculation.dueAmount > 0) DangerRed else SuccessGreen
+                                    )
+                                    Text(
+                                        text = if (uiState.calculation.dueAmount > 0) CurrencyUtils.format(uiState.calculation.dueAmount) else "Fully Paid ✓",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = if (uiState.calculation.dueAmount > 0) DangerRed else SuccessGreen
+                                    )
+                                }
                             }
                         }
 
@@ -467,6 +485,7 @@ fun CreateBillScreen(
                             value = uiState.notes,
                             onValueChange = { viewModel.setNotes(it) },
                             label = { Text("Notes / Remarks (Optional)") },
+                            placeholder = { Text("Add any notes, terms or delivery instructions") },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -558,65 +577,81 @@ fun CartItemCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // Controls row: Stepper and Rate
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Quantity Stepper
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(SurfaceVariantLight)
-                ) {
-                    IconButton(
-                        onClick = { onQtyChange(item.quantity - 1.0) },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(16.dp))
-                    }
+                Column {
                     Text(
-                        text = "${item.quantity} ${item.unit}",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(horizontal = 6.dp)
+                        text = "Quantity",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextMuted
                     )
-                    IconButton(
-                        onClick = { onQtyChange(item.quantity + 1.0) },
-                        modifier = Modifier.size(36.dp)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(SurfaceVariantLight)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(16.dp))
+                        IconButton(
+                            onClick = { onQtyChange(item.quantity - 1.0) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(16.dp))
+                        }
+                        Text(
+                            text = "${item.quantity} ${item.unit}",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                        IconButton(
+                            onClick = { onQtyChange(item.quantity + 1.0) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(16.dp))
+                        }
                     }
                 }
 
                 // Rate field
                 OutlinedTextField(
-                    value = item.rate.toString(),
+                    value = if (item.rate == 0.0) "" else item.rate.toString(),
                     onValueChange = { onRateChange(it.toDoubleOrNull() ?: 0.0) },
-                    label = { Text("Rate") },
+                    label = { Text("Rate (₹)") },
+                    placeholder = { Text("0.00") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp)
+                    modifier = Modifier.width(130.dp)
                 )
+            }
 
-                // Item Total
-                val calculated = item.quantity * item.rate
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = CurrencyUtils.format(calculated),
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                        color = PrimaryBlue
-                    )
-                    if (item.taxRate > 0) {
-                        Text(
-                            text = "+${item.taxRate}% tax",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextMuted
-                        )
-                    }
-                }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Item Total banner
+            val calculated = item.quantity * item.rate
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceVariantLight)
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (item.taxRate > 0) "Total (${item.taxRate}% GST incl.)" else "Item Total",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextMuted
+                )
+                Text(
+                    text = CurrencyUtils.format(calculated),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryBlue
+                )
             }
         }
     }
@@ -745,54 +780,53 @@ fun CustomItemDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Item Name *") },
+                    placeholder = { Text("e.g. Service Fee, Custom Spare") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag("custom_item_name")
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = qtyText,
-                        onValueChange = { qtyText = it },
-                        label = { Text("Quantity") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.weight(1f).testTag("custom_item_qty")
-                    )
-                    OutlinedTextField(
-                        value = unit,
-                        onValueChange = { unit = it },
-                        label = { Text("Unit") },
-                        singleLine = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = qtyText,
+                    onValueChange = { qtyText = it },
+                    label = { Text("Quantity") },
+                    placeholder = { Text("1.0") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().testTag("custom_item_qty")
+                )
+                Spacer(modifier = Modifier.height(10.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = rateText,
-                        onValueChange = { rateText = it },
-                        label = { Text("Rate (₹) *") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.weight(1f).testTag("custom_item_rate")
-                    )
-                    OutlinedTextField(
-                        value = taxRateText,
-                        onValueChange = { taxRateText = it },
-                        label = { Text("GST %") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                OutlinedTextField(
+                    value = unit,
+                    onValueChange = { unit = it },
+                    label = { Text("Unit (Pcs, Kg, Box, etc.)") },
+                    placeholder = { Text("Pcs") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = rateText,
+                    onValueChange = { rateText = it },
+                    label = { Text("Rate (₹) *") },
+                    placeholder = { Text("0.00") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().testTag("custom_item_rate")
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = taxRateText,
+                    onValueChange = { taxRateText = it },
+                    label = { Text("GST % (0, 5, 12, 18, 28)") },
+                    placeholder = { Text("0") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(18.dp))
 

@@ -1,5 +1,7 @@
 package com.example.mybillbook.ui.khata
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -151,22 +155,64 @@ fun RecordPaymentScreen(
             }
 
             // Payment Type Toggle (Payment In vs Payment Out)
-            Row(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             ) {
-                FilterChip(
-                    selected = paymentType == "PAYMENT_IN",
-                    onClick = { paymentType = "PAYMENT_IN" },
-                    label = { Text("Payment Received (In)") },
-                    modifier = Modifier.weight(1f).testTag("payment_in_chip")
-                )
-                FilterChip(
-                    selected = paymentType == "PAYMENT_OUT",
-                    onClick = { paymentType = "PAYMENT_OUT" },
-                    label = { Text("Payment Paid (Out)") },
-                    modifier = Modifier.weight(1f).testTag("payment_out_chip")
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                ) {
+                    val inSelected = paymentType == "PAYMENT_IN"
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { paymentType = "PAYMENT_IN" }
+                            .testTag("payment_in_chip"),
+                        color = if (inSelected) SuccessGreen else Color.Transparent,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Payment In",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                color = if (inSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    val outSelected = paymentType == "PAYMENT_OUT"
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { paymentType = "PAYMENT_OUT" }
+                            .testTag("payment_out_chip"),
+                        color = if (outSelected) DangerRed else Color.Transparent,
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Payment Out",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                color = if (outSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             }
 
             // Customer Selector Card
@@ -239,6 +285,7 @@ fun RecordPaymentScreen(
                     errorMessage = null
                 },
                 label = { Text("Payment Amount (₹) *") },
+                placeholder = { Text("0.00") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("payment_amount_input")
@@ -257,7 +304,9 @@ fun RecordPaymentScreen(
             // Payment Mode
             Text("Payment Method", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(PaymentMethods.CASH, PaymentMethods.UPI, PaymentMethods.BANK, PaymentMethods.CARD).forEach { method ->
@@ -275,6 +324,7 @@ fun RecordPaymentScreen(
                 value = referenceNumber,
                 onValueChange = { referenceNumber = it },
                 label = { Text("Reference / UPI / Txn ID (Optional)") },
+                placeholder = { Text("e.g. UPI Ref ID, Cheque No.") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -284,6 +334,7 @@ fun RecordPaymentScreen(
                 value = notes,
                 onValueChange = { notes = it },
                 label = { Text("Notes / Remarks (Optional)") },
+                placeholder = { Text("Add any payment notes or remarks") },
                 modifier = Modifier.fillMaxWidth()
             )
         }

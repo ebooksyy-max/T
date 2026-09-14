@@ -57,6 +57,7 @@ fun BillDetailsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(invoiceWithItems?.invoice?.invoiceNumber ?: "Invoice Details", fontWeight = FontWeight.Bold) },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -95,25 +96,23 @@ fun BillDetailsScreen(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        OutlinedButton(
+                        SecondaryButton(
+                            text = "Reminder",
+                            icon = Icons.Default.NotificationsNone,
                             onClick = {
-                                if (inv.customerPhoneSnapshot.isNotBlank()) {
-                                    ShareUtils.sendPaymentReminder(
-                                        context = context,
-                                        customerPhone = inv.customerPhoneSnapshot,
-                                        customerName = inv.customerNameSnapshot,
-                                        dueAmount = inv.dueAmount,
-                                        upiId = business?.upiId ?: "",
-                                        businessName = business?.businessName ?: "Our Store"
-                                    )
-                                }
+                                ShareUtils.sendPaymentReminder(
+                                    context = context,
+                                    customerPhone = inv.customerPhoneSnapshot,
+                                    customerName = inv.customerNameSnapshot,
+                                    dueAmount = inv.dueAmount,
+                                    upiId = business?.upiId ?: "",
+                                    businessName = business?.businessName ?: "Our Store"
+                                )
                             },
-                            modifier = Modifier.weight(1f).testTag("send_reminder_button")
-                        ) {
-                            Icon(Icons.Default.NotificationsNone, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Reminder")
-                        }
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("send_reminder_button")
+                        )
 
                         PrimaryButton(
                             text = "Record Payment",

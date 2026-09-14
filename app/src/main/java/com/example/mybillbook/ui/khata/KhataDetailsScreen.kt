@@ -69,6 +69,7 @@ fun KhataDetailsScreen(
                         Text(customer?.phone ?: "", style = MaterialTheme.typography.bodySmall)
                     }
                 },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

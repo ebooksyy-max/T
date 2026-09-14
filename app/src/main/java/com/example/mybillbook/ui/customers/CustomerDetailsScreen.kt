@@ -62,6 +62,7 @@ fun CustomerDetailsScreen(
         topBar = {
             TopAppBar(
                 title = { Text(customer?.name ?: "Customer Details", fontWeight = FontWeight.Bold) },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

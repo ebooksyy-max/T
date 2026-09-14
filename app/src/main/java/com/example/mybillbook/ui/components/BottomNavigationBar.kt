@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import com.example.mybillbook.ui.navigation.Routes
+import com.example.mybillbook.ui.theme.BillBookColors
 import com.example.mybillbook.ui.theme.PrimaryBlue
 
 sealed class BottomNavItem(val route: String, val title: String, val icon: ImageVector) {
@@ -61,9 +62,11 @@ fun AppBottomNavigationBar(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryBlue,
-                    selectedTextColor = PrimaryBlue,
-                    indicatorColor = com.example.mybillbook.ui.theme.PrimaryBlueLight
+                    selectedIconColor = BillBookColors.Primary,
+                    selectedTextColor = BillBookColors.Primary,
+                    indicatorColor = BillBookColors.PrimaryLight,
+                    unselectedIconColor = BillBookColors.TextSecondary,
+                    unselectedTextColor = BillBookColors.TextSecondary
                 )
             )
         }

@@ -11,25 +11,31 @@ plugins {
 
 android {
   namespace = "com.example"
-  compileSdk { version = release(36) { minorApiLevel = 1 } }
+  compileSdk = 35
 
   defaultConfig {
     applicationId = "com.aistudio.mybillbook.zkpvr"
     minSdk = 24
-    targetSdk = 36
+    targetSdk = 35
     versionCode = 1
-    versionName = "1.0"
+    versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      val propStoreFile = (project.findProperty("storeFile") as? String)?.trim()
+      val candidates = listOfNotNull(
+        if (!propStoreFile.isNullOrBlank()) file("${rootDir}/$propStoreFile") else null,
+        if (!propStoreFile.isNullOrBlank()) file("$projectDir/$propStoreFile") else null,
+        file("${rootDir}/my-release-key.jks"),
+        file("$projectDir/my-release-key.jks")
+      )
+      storeFile = candidates.firstOrNull { it.exists() } ?: file("${rootDir}/my-release-key.jks")
+      storePassword = (project.findProperty("storePassword") as? String)?.trim() ?: System.getenv("STORE_PASSWORD") ?: "MyVeryStrongPasswordGSTCalc123!"
+      keyAlias = (project.findProperty("keyAlias") as? String)?.trim() ?: "GSTCalc"
+      keyPassword = (project.findProperty("keyPassword") as? String)?.trim() ?: System.getenv("KEY_PASSWORD") ?: "MyVeryStrongPasswordGSTCalc123!"
     }
     create("debugConfig") {
       storeFile = file("${rootDir}/debug.keystore")
@@ -42,7 +48,8 @@ android {
   buildTypes {
     release {
       isCrunchPngs = false
-      isMinifyEnabled = false
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
@@ -100,6 +107,7 @@ dependencies {
   implementation(libs.androidx.room.runtime)
   implementation(libs.coil.compose)
   implementation(libs.androidx.work.runtime.ktx)
+  implementation(libs.applovin.sdk)
   implementation(libs.converter.moshi)
   implementation(libs.firebase.ai)
   // Uncomment to use Firestore:

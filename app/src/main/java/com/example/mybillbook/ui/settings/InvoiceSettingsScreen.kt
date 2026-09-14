@@ -100,26 +100,24 @@ fun InvoiceSettingsScreen(
         ) {
             Text("Invoice Numbering", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = prefix,
-                    onValueChange = { prefix = it },
-                    label = { Text("Invoice Prefix") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f).testTag("invoice_prefix_input")
-                )
-                OutlinedTextField(
-                    value = nextNumber,
-                    onValueChange = { nextNumber = it },
-                    label = { Text("Next Serial No.") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f).testTag("next_invoice_number_input")
-                )
-            }
+            OutlinedTextField(
+                value = prefix,
+                onValueChange = { prefix = it },
+                label = { Text("Invoice Prefix") },
+                placeholder = { Text("e.g. INV-") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().testTag("invoice_prefix_input")
+            )
+
+            OutlinedTextField(
+                value = nextNumber,
+                onValueChange = { nextNumber = it },
+                label = { Text("Next Serial Number") },
+                placeholder = { Text("e.g. 1001") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().testTag("next_invoice_number_input")
+            )
 
             Text("Tax & Price Calculations", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
 
@@ -159,6 +157,7 @@ fun InvoiceSettingsScreen(
                 value = terms,
                 onValueChange = { terms = it },
                 label = { Text("Terms & Conditions") },
+                placeholder = { Text("Enter terms, payment instructions, return policy...") },
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -167,6 +166,7 @@ fun InvoiceSettingsScreen(
                 value = footer,
                 onValueChange = { footer = it },
                 label = { Text("Invoice Footer Greeting") },
+                placeholder = { Text("e.g. Thank you for your business!") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

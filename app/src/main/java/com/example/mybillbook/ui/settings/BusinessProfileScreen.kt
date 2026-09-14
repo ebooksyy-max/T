@@ -40,6 +40,7 @@ fun BusinessProfileScreen(
     var accountNumber by remember { mutableStateOf("") }
     var ifsc by remember { mutableStateOf("") }
     var isSaving by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         val b = container.businessRepository.getBusinessDirect()
@@ -81,6 +82,10 @@ fun BusinessProfileScreen(
                     PrimaryButton(
                         text = "Save Profile",
                         onClick = {
+                            if (phone.isNotBlank() && phone.length != 10) {
+                                phoneError = true
+                                return@PrimaryButton
+                            }
                             isSaving = true
                             scope.launch {
                                 val updated = BusinessEntity(
@@ -126,35 +131,49 @@ fun BusinessProfileScreen(
                 value = businessName,
                 onValueChange = { businessName = it },
                 label = { Text("Business / Store Name *") },
+                placeholder = { Text("e.g. Sharma General Store") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("profile_business_name")
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = ownerName,
-                    onValueChange = { ownerName = it },
-                    label = { Text("Owner Name") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    label = { Text("Contact Phone") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = ownerName,
+                onValueChange = { ownerName = it },
+                label = { Text("Owner Name") },
+                placeholder = { Text("e.g. Rajesh Kumar") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = phone,
+                onValueChange = { input ->
+                    val digits = input.filter { it.isDigit() }.take(10)
+                    phone = digits
+                    if (phoneError && (digits.isEmpty() || digits.length == 10)) {
+                        phoneError = false
+                    }
+                },
+                label = { Text("Contact Mobile Number") },
+                placeholder = { Text("10-digit mobile number") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = phoneError,
+                supportingText = {
+                    if (phoneError) {
+                        Text("Please enter a valid 10-digit mobile number", color = MaterialTheme.colorScheme.error)
+                    } else if (phone.isNotEmpty()) {
+                        Text("${phone.length}/10 digits")
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Business Email") },
+                placeholder = { Text("e.g. store@example.com") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -164,85 +183,82 @@ fun BusinessProfileScreen(
                 value = address,
                 onValueChange = { address = it },
                 label = { Text("Shop / Office Address") },
+                placeholder = { Text("Shop no., building, street address") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    label = { Text("City") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = state,
-                    onValueChange = { state = it },
-                    label = { Text("State") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = city,
+                onValueChange = { city = it },
+                label = { Text("City") },
+                placeholder = { Text("e.g. Mumbai, Bengaluru, Delhi") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = state,
+                onValueChange = { state = it },
+                label = { Text("State") },
+                placeholder = { Text("e.g. Maharashtra, Karnataka") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Text("Taxation (GST / PAN)", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = gstin,
-                    onValueChange = { gstin = it },
-                    label = { Text("GSTIN") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1.2f)
-                )
-                OutlinedTextField(
-                    value = pan,
-                    onValueChange = { pan = it },
-                    label = { Text("PAN Number") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = gstin,
+                onValueChange = { gstin = it },
+                label = { Text("GSTIN") },
+                placeholder = { Text("e.g. 27AAAAA0000A1Z5") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = pan,
+                onValueChange = { pan = it },
+                label = { Text("PAN Number") },
+                placeholder = { Text("e.g. ABCDE1234F") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Text("Digital Payments & Bank Details", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = PrimaryBlue)
 
             OutlinedTextField(
                 value = upiId,
                 onValueChange = { upiId = it },
-                label = { Text("UPI ID (e.g. yourstore@okhdfcbank)") },
+                label = { Text("UPI ID") },
+                placeholder = { Text("e.g. yourstore@okhdfcbank") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().testTag("profile_upi_id")
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = bankName,
-                    onValueChange = { bankName = it },
-                    label = { Text("Bank Name") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = ifsc,
-                    onValueChange = { ifsc = it },
-                    label = { Text("IFSC Code") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            OutlinedTextField(
+                value = bankName,
+                onValueChange = { bankName = it },
+                label = { Text("Bank Name") },
+                placeholder = { Text("e.g. HDFC Bank, SBI, ICICI") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = ifsc,
+                onValueChange = { ifsc = it },
+                label = { Text("IFSC Code") },
+                placeholder = { Text("e.g. HDFC0001234") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             OutlinedTextField(
                 value = accountNumber,
                 onValueChange = { accountNumber = it },
                 label = { Text("Bank Account Number") },
+                placeholder = { Text("e.g. 50100234567890") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()

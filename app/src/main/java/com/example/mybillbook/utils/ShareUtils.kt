@@ -85,23 +85,32 @@ object ShareUtils {
         upiId: String,
         businessName: String
     ) {
-        val text = "Dear $customerName, this is a gentle reminder regarding an outstanding balance of ${CurrencyUtils.format(dueAmount)} with $businessName." +
-                if (upiId.isNotBlank()) " You can pay directly via UPI ID: $upiId." else "" +
+        val displayName = customerName.ifBlank { "Customer" }
+        val text = "Dear $displayName, this is a gentle reminder regarding an outstanding balance of ${CurrencyUtils.format(dueAmount)} with $businessName." +
+                (if (upiId.isNotBlank()) " You can pay directly via UPI ID: $upiId." else "") +
                 " Thank you!"
 
-        try {
-            val uri = Uri.parse("smsto:$customerPhone")
-            val intent = Intent(Intent.ACTION_SENDTO, uri).apply {
-                putExtra("sms_body", text)
+        if (customerPhone.isNotBlank()) {
+            try {
+                val uri = Uri.parse("smsto:$customerPhone")
+                val intent = Intent(Intent.ACTION_SENDTO, uri).apply {
+                    putExtra("sms_body", text)
+                }
+                context.startActivity(intent)
+                return
+            } catch (e: Exception) {
+                // Fallback to generic text share below
             }
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            // Fallback to generic text share
+        }
+
+        try {
             val genericIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, text)
             }
             context.startActivity(Intent.createChooser(genericIntent, "Send Payment Reminder"))
+        } catch (e: Exception) {
+            Toast.makeText(context, "Could not open sharing apps", Toast.LENGTH_SHORT).show()
         }
     }
 
